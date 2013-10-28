@@ -103,7 +103,7 @@
 			key,
 			keyCount = keys.length,
 			headers,
-			data,
+			cellData,
 			rowCount = json.length,
 			table,
 			i, n, m, k;
@@ -183,7 +183,41 @@
 		return { data: collection };
 	}
 
-	function CSVToTable() {
+	function CSVToTable(csv) {
+		var csvRows = csv.split('\n');
+		var rowCount = csvRows.length -1;
+		var keys = $.map(csvRows[0].split(','), function(val, index) { return val.replace(/[\"\']/g, ""); });
+		var keyCount = keys.length;
+		var cellData,
+			cells;
+		var i, m, k;
+
+		table = '<table>';
+
+		// headers
+		headers = '<thead><tr>';
+		for (i = 0; i < keyCount; i++) {
+			headers += '<th>' + keys[i] + '</th>';
+		}
+		headers += '</tr></thead>';
+
+		cellData = '<tbody>';
+		for (m=1; m < rowCount; m++) {
+			cellData += '<tr>';
+			cells = csvRows[m].split(',');
+			cells = $.map(cells, function(val, index) { return val.replace(/[\"\']/g, ""); });
+
+			for (k = 0; k < keyCount; k++) {
+				var dataVal = cells[k];
+				cellData += '<td>' + dataVal + '</td>';
+			}
+			cellData += '</tr>';
+		}
+		cellData += '</tbody>';
+
+		table += headers + cellData + '</table>';
+
+		return table;
 
 	}
 

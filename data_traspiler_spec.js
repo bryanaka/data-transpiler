@@ -50,6 +50,7 @@ describe('converting data', function() {
 	};
 
 	var JSONDataKeys = ['first_name', 'last_name', 'age', 'favorite_food'];
+	var dataHeaders  = ['first name', 'last name', 'age', 'favorite food'];
 
 	var CSVData = '"first name","last name","age","favorite food"\n' +
 		'"bryan","robles","23","soft shell crab"\n'+
@@ -134,8 +135,20 @@ describe('converting data', function() {
 		});
 	});
 
-	xdescribe('CSVToTable', function() {
+	describe('CSVToTable', function() {
+		var tableFromCSV = $.CSVToTable(CSVData);
 
+		it('converts the first row of CSV to Table Headers', function() {
+			var headers = $(tableFromCSV).find('th');
+			headers.each( function(index, val) {
+				var testHeader = val.innerText;
+				expect(testHeader).toEqual(dataHeaders[index]);
+			});
+		});
+
+		it('converts each row of the CSV to a row inside a table', function() {
+			expect(tableFromCSV).toEqual(tableData);
+		});
 	});
 
 
