@@ -14,10 +14,6 @@
 		return string.trim().replace(/([a-z\d])([A-Z]+)/g, '$1_$2').replace(/[-\s]+/g, '_').toLowerCase();
 	}
 
-	function camelize(string) {
-		return string.trim().replace(/[-_\s]+(.)?/g, function(match, c){ return c ? c.toUpperCase() : ""; });
-	}
-
 	function space_out(string) {
 		string = String(string);
 		return string.trim().replace(/[-_]/g, ' ');
@@ -177,11 +173,13 @@
 		for (var m = 1; m < rowCount; m++) {
 			var obj = {};
 			for (var n = 0; n < keyCount; n++) {
-				obj[csvKeys[n]] = csvRows[m].split(',')[n].replace(/[\"\']/g, "");
+				var dataVal = csvRows[m].split(',')[n].replace(/[\"\']/g, "");
+				if(!isNaN(dataVal)) { dataVal = +dataVal; }
+				obj[csvKeys[n]] = dataVal;
 			}
 			collection.push(obj);
 		}
-		
+
 		return { data: collection };
 	}
 
