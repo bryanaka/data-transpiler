@@ -14,12 +14,6 @@
 		return string.trim().replace(/([a-z\d])([A-Z]+)/g, '$1_$2').replace(/[-\s]+/g, '_').toLowerCase();
 	}
 
-	// replaces dash-cashing/underscored/snake_casing with spaces 
-	function space_out(string) {
-		string = String(string);
-		return string.trim().replace(/[-_]/g, ' ');
-	}
-
 	// capitalizes all first letters of every word
 	function capitalize(string) {
 		string = string.trim().replace(/[\s-_]+[a-z]/g, function(match, c) {
@@ -57,6 +51,13 @@
 			return val.innerText;
 		});
 	}
+	function getTableRowData($el) {
+		var rows = $el.find('tr').map(function(index, val) {
+			return $(val).find('td');
+		});
+		console.log( Array.prototype.slice.call(rows, 1) );
+		return rows;
+	}
 
 	// JSON Helper Functions
 
@@ -92,9 +93,9 @@
 	function getCSVKeys(csvRow, modifier) {
 		return $.map(csvRow.split(','), function(val, index) {
 			if(typeof modifier !== 'undefined') {
-				return modifier.call( this, trimQuotes(val) );
+				return modifier.call( this, capitalize( trimQuotes(val) ) );
 			} else {
-				return trimQuotes(val);
+				return capitalize( trimQuotes(val) );
 			}
 		});
 	}
@@ -111,8 +112,7 @@
 		while(i < data.length) {
 			obj = {};
 			for(n = 0; n < keys.length; n++) {
-				data[i] = coerceNumber(data[i]);
-				obj[keys[n]] = data[i];
+				obj[keys[n]] = coerceNumber(data[i]);
 				i++;
 			}
 			collection.push(obj);
@@ -125,7 +125,6 @@
 			data      = getTableData(this),
 			i = 0,
 			csv, n;
-
 		csv ='"'+keys.join('\",\"') + '"\n';
 		while(i < data.length) {
 			for(n = 0; n < keys.length; n++) {
@@ -149,7 +148,7 @@
 		// headers
 		headers = '<thead><tr>';
 		for (i = 0; i < keys.length; i++) {
-			headers += '<th>' + space_out(keys[i]) + '</th>';
+			headers += '<th>' + capitalize(keys[i]) + '</th>';
 		}
 		headers += '</tr></thead>';
 
@@ -177,7 +176,7 @@
 			csv, m, n;
 		if( !$.isArray(json) ) { json = [json]; }
 
-		csv = '"' + $.map(keys, function(val, index) { return space_out(val); }).join('\",\"') + '"\n';
+		csv = '"' + $.map(keys, function(val, index) { return capitalize(val); }).join('\",\"') + '"\n';
 
 		for (m=0; m < json.length; m++) {
 

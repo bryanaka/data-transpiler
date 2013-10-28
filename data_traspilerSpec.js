@@ -2,10 +2,10 @@ describe('converting data', function() {
 	var tableData = '<table>'+
 		'<thead>' +
 			'<tr>' +
-				'<th>first name</th>' +
-				'<th>last name</th>' +
-				'<th>age</th>' +
-				'<th>favorite food</th>' +
+				'<th>First Name</th>' +
+				'<th>Last Name</th>' +
+				'<th>Age</th>' +
+				'<th>Favorite Food</th>' +
 			'</tr>' +
 		'</thead>' +
 		'<tbody>' +
@@ -50,9 +50,9 @@ describe('converting data', function() {
 	};
 
 	var JSONDataKeys = ['first_name', 'last_name', 'age', 'favorite_food'];
-	var dataHeaders  = ['first name', 'last name', 'age', 'favorite food'];
+	var dataHeaders  = ['First Name', 'Last Name', 'Age', 'Favorite Food'];
 
-	var CSVData = '"first name","last name","age","favorite food"\n' +
+	var CSVData = '"First Name","Last Name","Age","Favorite Food"\n' +
 		'"bryan","robles","23","soft shell crab"\n'+
 		'"kelly","montgomery","52","soup"\n'+
 		'"jess","hogan","21","vegan pizza"\n';
@@ -97,7 +97,7 @@ describe('converting data', function() {
 		it('converts JSON keys to the table headers', function() {
 			var headers = $(tableFromJSON).find('th');
 			headers.each( function(index, val) {
-				var testKey = val.innerText.replace(/\s/gi, "_");
+				var testKey = val.innerText.replace(/\s/gi, "_").toLowerCase();
 				expect( JSONData.data[0].hasOwnProperty(testKey) ).toBeTruthy();
 			});
 		});
