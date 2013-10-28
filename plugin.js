@@ -34,6 +34,7 @@
 
 		while(i < dataCount) {
 			var obj = {};
+			// can probably use array.slice here?
 			for(var n = 0; n < keyCount; n++) {
 				if(!isNaN(data[i])) { data[i] = +data[i]; }
 				obj[keys[n]] = data[i];
@@ -49,9 +50,19 @@
 			keyCount  = keys.length,
 			data      = getData(this),
 			dataCount = data.length,
-			csv       = '';
+			csv       = '',
+			i = 0;
 
 		csv = csv + '"'+keys.join('\",\"') + '"\n';
+		// for each row in the html
+		// place inside as a row of CSV data and add a new line.
+		while(i < dataCount) {
+			for(var n = 0; n < keyCount; n++) {
+				csv = csv + '"'+data[i]+'",';
+				i++;
+			}
+			csv = csv.replace(/(,\s*$)/g, '') + '\n';
+		}
 		return csv;
 	}
 
