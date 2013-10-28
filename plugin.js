@@ -43,6 +43,25 @@
 		});
 	}
 
+	function filterKeys(json) {
+		var keys = [],
+			key,
+			objCount = json.length;
+
+		if( $.isArray(json) ) {
+			for (n = 0; n < objCount; n++) {
+				for (key in json[n]) {
+					if( !$.inArray(key) || n === 0 ) {
+						keys.push(key);
+					}
+				}
+			}
+		} else {
+			for (key in json) { keys.push(key); }
+		}
+		return keys;
+	}
+
 	function tableToJSON() {
 		var keys      = getKeys(this, underscored),
 			keyCount  = keys.length,
@@ -72,10 +91,10 @@
 			csv       = '',
 			i = 0;
 
-		csv = csv + '"'+keys.join('\",\"') + '"\n';
+		csv ='"'+keys.join('\",\"') + '"\n';
 		while(i < dataCount) {
 			for(var n = 0; n < keyCount; n++) {
-				csv = csv + '"'+data[i]+'",';
+				csv += '"'+data[i]+'",';
 				i++;
 			}
 			csv = csv.replace(/(,\s*$)/g, '') + '\n';
@@ -84,28 +103,16 @@
 	}
 
 	function JSONToTable(json) {
-		var keys = [],
+		var keys = filterKeys(json),
 			key,
-			keyCount,
+			keyCount = keys.length,
 			headers,
 			data,
-			rowCount = 1,
+			rowCount = json.length,
 			table,
 			i, n, m, k;
 
-		// cycle through array of objects and get all possible keys
-		if( $.isArray(json) ) {
-			rowCount = json.length;
 
-			for (n = 0; n < rowCount; n++) {
-				for (key in json[n]) {
-					if( !$.inArray(key) || n === 0 ) {
-						keys.push(key);
-					}
-				}
-			}
-		}
-		keyCount = keys.length;
 		table = '<table>';
 
 		// headers
@@ -136,14 +143,36 @@
 		return table;
 	}
 
-	function JSONToCSV() {}
+	function JSONToCSV(json) {
+		var keys = filterKeys(json),
+			keyCount = keys.length,
+			rowCount = json.length,
+			csv, m, k;
+
+		csv = '"' + $.map(keys, function(val, index) { return space_out(val); }).join('\",\"') + '"\n';
+
+		for (m=0; m < rowCount; m++) {
+			for (k = 0; k < keyCount; k++) {
+				if ( json[m].hasOwnProperty(keys[k]) ) {
+					csv += '"' + json[m][keys[k]] + '",';
+				} else {
+					csv += '"",';
+				}
+			}
+			csv = csv.replace(/(,\s*$)/g, '') + '\n';
+		}
+		return csv;
+	}
 
 	function CSVToTable() {}
 	function CSVToJSON() {}
 
 	$.fn.tableToJSON = tableToJSON;
 	$.fn.tableToCSV = tableToCSV;
+
+	// utilities
 	$.JSONToTable = JSONToTable;
+	$.JSONToCSV = JSONToCSV;
 
 
 })(jQuery, window, document);

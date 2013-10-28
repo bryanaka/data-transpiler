@@ -107,8 +107,17 @@ describe('convert', function() {
 
 	});
 
-	xdescribe('JSONToCSV', function() {
+	describe('JSONToCSV', function() {
+		var CSVFromJSON = $.JSONToCSV(JSONData.data);
 
+		it('converts the JSON keys to the first row of the CSV', function() {
+			var headers = CSVFromJSON.split('\n')[0];
+			expect(headers).toEqual( CSVData.split('\n')[0] );
+		});
+
+		it('converts the Object values to CSV rows.', function() {
+			expect(CSVFromJSON).toEqual(CSVData);
+		});
 	});
 
 	xdescribe('CSVToJSON', function() {
