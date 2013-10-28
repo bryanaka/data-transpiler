@@ -7,6 +7,31 @@ Converts to and from the following data formats
 - Object or Array of Objects (collection) only one level currently
 - CSV
 
+Uses
+-------------------------
+
+    $(<select table element here>).tableToJSON();
+    #=> Object {data: [{...}, {...}]}
+    
+    $(<select table element here>).tableToCSV();
+    #=> String '"blah","topblah","lowblah"'...
+
+	// use a collection or obj
+    $.JSONToCSV([...]);
+    #=> String '"blah","topblah","lowblah"'...
+
+    $.JSONToTable([...]);
+    #=> String '<table>....</table>';
+	
+	// use a csv string
+	$.CSVToJSON(csvString);
+	#=> Object { data: [{...}, {...}] }
+
+    $.CSVToTable(csvString);
+    #=> String '<table>....</table>';
+
+
+
 Tests
 ---------------------
 

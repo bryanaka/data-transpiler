@@ -144,6 +144,8 @@
 			table,
 			i, m, k;
 
+		if( !$.isArray(json) ) { json = [json]; }
+
 		// headers
 		headers = '<thead><tr>';
 		for (i = 0; i < keys.length; i++) {
