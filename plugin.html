@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>plugin</title>
+</head>
+<body>
+
+<div id="json" data-json='{"data": [{"first_name": "bryan", "last_name": "robles", "age": 23, "favorite_food": "soft shell crab"},{"first_name": "kelly", "last_name": "montgomery", "age": 52, "favorite_food": "soup"},{"first_name": "jess", "last_name": "hogan", "age": 21, "favorite_food": "vegan pizza"}]}'></div>
+
+<pre id="csv">
+"first name","last Name","age","favorite food"
+"bryan","robles","23","soft shell crab"
+"kelly","montgomery","52","soup"
+"jess","hogan","21","vegan pizza"
+</pre>
+
+<table id="table">
+	<thead>
+		<tr>
+			<th>first name</th>
+			<th>last name</th>
+			<th>age</th>
+			<th>favorite food</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>bryan</td>
+			<td>robles</td>
+			<td>23</td>
+			<td>soft shell crab</td>
+		</tr>
+		<tr>
+			<td>kelly</td>
+			<td>montgomery</td>
+			<td>52</td>
+			<td>soup</td>
+		</tr>
+		<tr>
+			<td>jess</td>
+			<td>hogan</td>
+			<td>21</td>
+			<td>vegan pizza</td>
+		</tr>
+	</tbody>
+</table>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>if(!window.jQuery){document.write('<script src=".\/jquery.js"><\/script>')}</script>
+<script src="./plugin.js"></script>
+</body>
+</html>
