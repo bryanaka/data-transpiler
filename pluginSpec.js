@@ -49,6 +49,8 @@ describe('convert', function() {
 		}]
 	};
 
+	var JSONDataKeys = ['first_name', 'last_name', 'age', 'favorite_food'];
+
 	var CSVData = '"first name","last name","age","favorite food"\n' +
 		'"bryan","robles","23","soft shell crab"\n'+
 		'"kelly","montgomery","52","soup"\n'+
@@ -88,7 +90,22 @@ describe('convert', function() {
 		});
 	});
 
-	xdescribe('JSONToTable', function() {
+	describe('JSONToTable', function() {
+		var tableFromJSON = $.JSONToTable(JSONData);
+
+		it('converts JSON keys to the table headers', function() {
+			var headers = $(tableFromJSON).find('th');
+			expect(headers.length).toBeGreaterThan(0);
+			
+			headers.forEach( function(val, index) {
+				var testKey = val.innerText.replace(/\s/gi, "_");
+				expect( JSONData.data[0].hasOwnProperty(testKey) ).toBeTruthy();
+			});
+		});
+
+		xit('converts JSON object values to the data cells', function() {
+
+		});
 
 	});
 

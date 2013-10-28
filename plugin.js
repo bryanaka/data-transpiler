@@ -66,7 +66,10 @@
 		return csv;
 	}
 
-	function JSONToTable() {}
+	function JSONToTable(obj) {
+
+	}
+
 	function JSONToCSV() {}
 
 	function CSVToTable() {}
@@ -74,6 +77,7 @@
 
 	$.fn.tableToJSON = tableToJSON;
 	$.fn.tableToCSV = tableToCSV;
+	$.JSONToTable = JSONToTable;
 
 
 })(jQuery, window, document);
