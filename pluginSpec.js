@@ -1,4 +1,4 @@
-describe('convert', function() {
+describe('converting data', function() {
 	var tableData = '<table>'+
 		'<thead>' +
 			'<tr>' +
@@ -120,8 +120,18 @@ describe('convert', function() {
 		});
 	});
 
-	xdescribe('CSVToJSON', function() {
+	describe('CSVToJSON', function() {
+		var JSONFromCSV = $.CSVToJSON(CSVData);
 
+		it('converts the first row of CSV to JSON Keys', function() {
+			JSONDataKeys.forEach(function(val, index) {
+				expect(JSONFromCSV.data[0].hasOwnProperty(val)).toBeTruthy();
+			});
+		});
+
+		it('converts each row of the CSV to an object inside an array', function() {
+			expect( JSON.stringify(JSONFromCSV) ).toEqual( JSON.stringify(JSONData) );
+		});
 	});
 
 	xdescribe('CSVToTable', function() {

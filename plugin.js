@@ -164,8 +164,30 @@
 		return csv;
 	}
 
-	function CSVToTable() {}
-	function CSVToJSON() {}
+	function CSVToJSON(csv) {
+		var csvRows = csv.split('\n');
+		var csvKeys = csvRows[0].split(',');
+		csvKeys = $.map(csvKeys, function(val, index) {
+			return underscored( val.replace(/[\"\']/g, "") );
+		});
+		var keyCount = csvKeys.length;
+		var rowCount = csvRows.length -1;
+		var collection = [];
+
+		for (var m = 1; m < rowCount; m++) {
+			var obj = {};
+			for (var n = 0; n < keyCount; n++) {
+				obj[csvKeys[n]] = csvRows[m].split(',')[n].replace(/[\"\']/g, "");
+			}
+			collection.push(obj);
+		}
+		
+		return { data: collection };
+	}
+
+	function CSVToTable() {
+
+	}
 
 	$.fn.tableToJSON = tableToJSON;
 	$.fn.tableToCSV = tableToCSV;
@@ -173,6 +195,8 @@
 	// utilities
 	$.JSONToTable = JSONToTable;
 	$.JSONToCSV = JSONToCSV;
+	$.CSVToJSON = CSVToJSON;
+	$.CSVToTable = CSVToTable;
 
 
 })(jQuery, window, document);
