@@ -4,16 +4,35 @@
 		ignore: []
 	};
 
-	function getKeys($el) {
-		var keys = $el.find('th').map(function(index, val) {
-			return val.innerText;
-		});
-		return $.makeArray(keys);
+	if (!String.prototype.trim) {
+		string.prototype.trim = function () {
+			return this.replace(/^\s+|\s+$/g, '');
+		};
 	}
 
-	function getUnderscoredKeys($el) {
+	function underscored(string) {
+		return string.trim().replace(/([a-z\d])([A-Z]+)/g, '$1_$2').replace(/[-\s]+/g, '_').toLowerCase();
+	}
+
+	function camelize(string) {
+		return string.trim().replace(/[-_\s]+(.)?/g, function(match, c){ return c ? c.toUpperCase() : ""; });
+	}
+
+	function space_out(string) {
+		string = String(string);
+		return string.trim().replace(/[-_]/g, ' ');
+	}
+
+	function capitalize(string) {
+		string = string.trim().replace(/[\s-_]+[a-z]/g, function(match, c) {
+			return c.toUpperCase();
+		});
+		return string.charAt(0).toUpperCase() + string.slice(1);
+	}
+
+	function getKeys($el, modifier) {
 		var keys = $el.find('th').map(function(index, val) {
-			return val.innerText.replace(/\s/gi, "_");
+			return (typeof modifier !== 'undefined' ? modifier.call(this, val.innerText) : val.innerText);
 		});
 		return $.makeArray(keys);
 	}
@@ -25,7 +44,7 @@
 	}
 
 	function tableToJSON() {
-		var keys      = getUnderscoredKeys(this),
+		var keys      = getKeys(this, underscored),
 			keyCount  = keys.length,
 			data      = getData(this),
 			dataCount = data.length,
@@ -92,7 +111,7 @@
 		// headers
 		headers = '<thead><tr>';
 		for (i = 0; i < keyCount; i++) {
-			headers += '<th>' + keys[i] + '</th>';
+			headers += '<th>' + space_out(keys[i]) + '</th>';
 		}
 		headers += '</tr></thead>';
 

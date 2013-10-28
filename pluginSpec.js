@@ -1,5 +1,5 @@
 describe('convert', function() {
-	var tableData = '<table id="table">'+
+	var tableData = '<table>'+
 		'<thead>' +
 			'<tr>' +
 				'<th>first name</th>' +
@@ -101,8 +101,8 @@ describe('convert', function() {
 			});
 		});
 
-		xit('converts JSON object values to the data cells', function() {
-
+		it('converts JSON object values to the data cells', function() {
+			expect(tableFromJSON).toEqual(tableData);
 		});
 
 	});
