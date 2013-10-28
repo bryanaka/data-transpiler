@@ -91,13 +91,11 @@ describe('convert', function() {
 	});
 
 	describe('JSONToTable', function() {
-		var tableFromJSON = $.JSONToTable(JSONData);
+		var tableFromJSON = $.JSONToTable(JSONData.data);
 
 		it('converts JSON keys to the table headers', function() {
 			var headers = $(tableFromJSON).find('th');
-			expect(headers.length).toBeGreaterThan(0);
-			
-			headers.forEach( function(val, index) {
+			headers.each( function(index, val) {
 				var testKey = val.innerText.replace(/\s/gi, "_");
 				expect( JSONData.data[0].hasOwnProperty(testKey) ).toBeTruthy();
 			});

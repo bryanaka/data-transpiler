@@ -54,8 +54,6 @@
 			i = 0;
 
 		csv = csv + '"'+keys.join('\",\"') + '"\n';
-		// for each row in the html
-		// place inside as a row of CSV data and add a new line.
 		while(i < dataCount) {
 			for(var n = 0; n < keyCount; n++) {
 				csv = csv + '"'+data[i]+'",';
@@ -66,8 +64,57 @@
 		return csv;
 	}
 
-	function JSONToTable(obj) {
+	function JSONToTable(json) {
+		var keys = [],
+			key,
+			keyCount,
+			headers,
+			data,
+			rowCount = 1,
+			table,
+			i, n, m, k;
 
+		// cycle through array of objects and get all possible keys
+		if( $.isArray(json) ) {
+			rowCount = json.length;
+
+			for (n = 0; n < rowCount; n++) {
+				for (key in json[n]) {
+					if( !$.inArray(key) || n === 0 ) {
+						keys.push(key);
+					}
+				}
+			}
+		}
+		keyCount = keys.length;
+		table = '<table>';
+
+		// headers
+		headers = '<thead><tr>';
+		for (i = 0; i < keyCount; i++) {
+			headers += '<th>' + keys[i] + '</th>';
+		}
+		headers += '</tr></thead>';
+
+		// data
+		cellData = '<tbody>';
+		for (m=0; m < rowCount; m++) {
+			cellData += '<tr>';
+			// check if object has the corresponding key-value pair for the current header
+			for (k = 0; k < keyCount; k++) {
+				if ( json[m].hasOwnProperty(keys[k]) ) {
+					cellData += '<td>' + json[m][keys[k]] + '</td>';
+				} else {
+					cellData += '<td></td>';
+				}
+			}
+			cellData += '</tr>';
+		}
+		cellData += '</tbody>';
+
+		table += headers + cellData + '</table>';
+
+		return table;
 	}
 
 	function JSONToCSV() {}
