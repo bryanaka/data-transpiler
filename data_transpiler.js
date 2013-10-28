@@ -1,76 +1,117 @@
 (function($, window, document, undefined) {
 
-	var defaults = {
-		ignore: []
-	};
+	// String Helper Functions
 
+	// trims whitespace
 	if (!String.prototype.trim) {
 		string.prototype.trim = function () {
 			return this.replace(/^\s+|\s+$/g, '');
 		};
 	}
 
+	// sets string to underscored/snake_casing
 	function underscored(string) {
 		return string.trim().replace(/([a-z\d])([A-Z]+)/g, '$1_$2').replace(/[-\s]+/g, '_').toLowerCase();
 	}
 
+	// replaces dash-cashing/underscored/snake_casing with spaces 
 	function space_out(string) {
 		string = String(string);
 		return string.trim().replace(/[-_]/g, ' ');
 	}
 
+	// capitalizes all first letters of every word
 	function capitalize(string) {
 		string = string.trim().replace(/[\s-_]+[a-z]/g, function(match, c) {
-			return c.toUpperCase();
+			return match.replace(/[-_]/g, ' ').toUpperCase();
 		});
 		return string.charAt(0).toUpperCase() + string.slice(1);
 	}
 
-	function getKeys($el, modifier) {
+	// if a string is a number, coerce the number
+	function coerceNumber(num) {
+		if(!isNaN(num)) { num = +num; }
+		return num;
+	}
+	
+	// Table Helper Functions
+	
+	/*
+	** @param $el:      any valid jquery selector
+	** @param modifier: any function that modifies and returns a string
+	** @return          array of keys created from the 'th' elements found
+	*/
+	function getTableKeys($el, modifier) {
 		var keys = $el.find('th').map(function(index, val) {
 			return (typeof modifier !== 'undefined' ? modifier.call(this, val.innerText) : val.innerText);
 		});
 		return $.makeArray(keys);
 	}
 
-	function getData($el) {
+	/*
+	** @param $el: any valid jquery selector
+	** @return     an array of strings inside of each 'td' element cell
+	*/
+	function getTableData($el) {
 		return $el.find('td').map(function(index, val) {
 			return val.innerText;
 		});
 	}
 
-	function filterKeys(json) {
+	// JSON Helper Functions
+
+	/*
+	** @param collection: an array of objects (collection) or an object
+	** @return      an array of all posible keys 
+	*/
+	function filterKeys(collection) {
 		var keys = [],
 			key,
-			objCount = json.length;
+			objCount = collection.length;
 
-		if( $.isArray(json) ) {
+		if( $.isArray(collection) ) {
 			for (n = 0; n < objCount; n++) {
-				for (key in json[n]) {
+				for (key in collection[n]) {
 					if( !$.inArray(key) || n === 0 ) {
 						keys.push(key);
 					}
 				}
 			}
 		} else {
-			for (key in json) { keys.push(key); }
+			for (key in collection) { keys.push(key); }
 		}
 		return keys;
 	}
 
-	function tableToJSON() {
-		var keys      = getKeys(this, underscored),
-			keyCount  = keys.length,
-			data      = getData(this),
-			dataCount = data.length,
-			collection = [],
-			i = 0;
+	// CSV Helper Functions
 
-		while(i < dataCount) {
-			var obj = {};
-			// can probably use array.slice here?
-			for(var n = 0; n < keyCount; n++) {
-				if(!isNaN(data[i])) { data[i] = +data[i]; }
+	function trimQuotes(string) {
+		return string.replace(/(^[\"\']|[\"\']$)/g, "");
+	}
+
+	function getCSVKeys(csvRow, modifier) {
+		return $.map(csvRow.split(','), function(val, index) {
+			if(typeof modifier !== 'undefined') {
+				return modifier.call( this, trimQuotes(val) );
+			} else {
+				return trimQuotes(val);
+			}
+		});
+	}
+
+	// Public API
+
+	function tableToJSON() {
+		var keys       = getTableKeys(this, underscored),
+			data       = getTableData(this),
+			collection = [],
+			i = 0,
+			n, obj;
+
+		while(i < data.length) {
+			obj = {};
+			for(n = 0; n < keys.length; n++) {
+				data[i] = coerceNumber(data[i]);
 				obj[keys[n]] = data[i];
 				i++;
 			}
@@ -80,16 +121,14 @@
 	}
 
 	function tableToCSV() {
-		var keys      = getKeys(this),
-			keyCount  = keys.length,
-			data      = getData(this),
-			dataCount = data.length,
-			csv       = '',
-			i = 0;
+		var keys      = getTableKeys(this),
+			data      = getTableData(this),
+			i = 0,
+			csv, n;
 
 		csv ='"'+keys.join('\",\"') + '"\n';
-		while(i < dataCount) {
-			for(var n = 0; n < keyCount; n++) {
+		while(i < data.length) {
+			for(n = 0; n < keys.length; n++) {
 				csv += '"'+data[i]+'",';
 				i++;
 			}
@@ -100,82 +139,71 @@
 
 	function JSONToTable(json) {
 		var keys = filterKeys(json),
-			key,
-			keyCount = keys.length,
 			headers,
-			cellData,
-			rowCount = json.length,
+			tableBody,
 			table,
-			i, n, m, k;
-
-
-		table = '<table>';
+			i, m, k;
 
 		// headers
 		headers = '<thead><tr>';
-		for (i = 0; i < keyCount; i++) {
+		for (i = 0; i < keys.length; i++) {
 			headers += '<th>' + space_out(keys[i]) + '</th>';
 		}
 		headers += '</tr></thead>';
 
 		// data
-		cellData = '<tbody>';
-		for (m=0; m < rowCount; m++) {
-			cellData += '<tr>';
+		tableBody = '<tbody>';
+		for (m=0; m < json.length; m++) {
+			tableBody += '<tr>';
 			// check if object has the corresponding key-value pair for the current header
-			for (k = 0; k < keyCount; k++) {
+			for (k = 0; k < keys.length; k++) {
 				if ( json[m].hasOwnProperty(keys[k]) ) {
-					cellData += '<td>' + json[m][keys[k]] + '</td>';
+					tableBody += '<td>' + json[m][keys[k]] + '</td>';
 				} else {
-					cellData += '<td></td>';
+					tableBody += '<td></td>';
 				}
 			}
-			cellData += '</tr>';
+			tableBody += '</tr>';
 		}
-		cellData += '</tbody>';
+		tableBody += '</tbody>';
 
-		table += headers + cellData + '</table>';
-
-		return table;
+		return '<table>' + headers + tableBody + '</table>';
 	}
 
 	function JSONToCSV(json) {
 		var keys = filterKeys(json),
-			keyCount = keys.length,
-			rowCount = json.length,
-			csv, m, k;
+			csv, m, n;
+		if( !$.isArray(json) ) { json = [json]; }
 
 		csv = '"' + $.map(keys, function(val, index) { return space_out(val); }).join('\",\"') + '"\n';
 
-		for (m=0; m < rowCount; m++) {
-			for (k = 0; k < keyCount; k++) {
-				if ( json[m].hasOwnProperty(keys[k]) ) {
-					csv += '"' + json[m][keys[k]] + '",';
+		for (m=0; m < json.length; m++) {
+
+			for (n = 0; n < keys.length; n++) {
+				if ( json[m].hasOwnProperty(keys[n]) ) {
+					csv += '"' + json[m][keys[n]] + '",';
 				} else {
 					csv += '"",';
 				}
 			}
+
 			csv = csv.replace(/(,\s*$)/g, '') + '\n';
 		}
 		return csv;
 	}
 
 	function CSVToJSON(csv) {
-		var csvRows = csv.split('\n');
-		var csvKeys = csvRows[0].split(',');
-		csvKeys = $.map(csvKeys, function(val, index) {
-			return underscored( val.replace(/[\"\']/g, "") );
-		});
-		var keyCount = csvKeys.length;
-		var rowCount = csvRows.length -1;
-		var collection = [];
+		var csvRows    = csv.split('\n'),
+			keys       = getCSVKeys(csvRows[0], underscored),
+			rowCount   = csvRows.length -1,
+			collection = [],
+			obj, m, n;
 
-		for (var m = 1; m < rowCount; m++) {
-			var obj = {};
-			for (var n = 0; n < keyCount; n++) {
-				var dataVal = csvRows[m].split(',')[n].replace(/[\"\']/g, "");
-				if(!isNaN(dataVal)) { dataVal = +dataVal; }
-				obj[csvKeys[n]] = dataVal;
+		for (m = 1; m < rowCount; m++) {
+			obj = {};
+			for (n = 0; n < keys.length; n++) {
+				var dataVal = trimQuotes(csvRows[m].split(',')[n]);
+				obj[keys[n]] = coerceNumber(dataVal);
 			}
 			collection.push(obj);
 		}
@@ -184,11 +212,10 @@
 	}
 
 	function CSVToTable(csv) {
-		var csvRows = csv.split('\n');
-		var rowCount = csvRows.length -1;
-		var keys = $.map(csvRows[0].split(','), function(val, index) { return val.replace(/[\"\']/g, ""); });
-		var keyCount = keys.length;
-		var cellData,
+		var csvRows  = csv.split('\n'),
+			rowCount = csvRows.length -1,
+			keys     = getCSVKeys(csvRows[0]),
+			tableBody,
 			cells;
 		var i, m, k;
 
@@ -196,39 +223,39 @@
 
 		// headers
 		headers = '<thead><tr>';
-		for (i = 0; i < keyCount; i++) {
+		for (i = 0; i < keys.length; i++) {
 			headers += '<th>' + keys[i] + '</th>';
 		}
 		headers += '</tr></thead>';
 
-		cellData = '<tbody>';
+		tableBody = '<tbody>';
 		for (m=1; m < rowCount; m++) {
-			cellData += '<tr>';
+			tableBody += '<tr>';
 			cells = csvRows[m].split(',');
-			cells = $.map(cells, function(val, index) { return val.replace(/[\"\']/g, ""); });
+			cells = $.map(cells, function(val, index) { return trimQuotes(val); });
 
-			for (k = 0; k < keyCount; k++) {
+			for (k = 0; k < keys.length; k++) {
 				var dataVal = cells[k];
-				cellData += '<td>' + dataVal + '</td>';
+				tableBody += '<td>' + dataVal + '</td>';
 			}
-			cellData += '</tr>';
+			tableBody += '</tr>';
 		}
-		cellData += '</tbody>';
+		tableBody += '</tbody>';
 
-		table += headers + cellData + '</table>';
+		table += headers + tableBody + '</table>';
 
 		return table;
 
 	}
 
 	$.fn.tableToJSON = tableToJSON;
-	$.fn.tableToCSV = tableToCSV;
+	$.fn.tableToCSV  = tableToCSV;
 
 	// utilities
 	$.JSONToTable = JSONToTable;
-	$.JSONToCSV = JSONToCSV;
-	$.CSVToJSON = CSVToJSON;
-	$.CSVToTable = CSVToTable;
+	$.JSONToCSV   = JSONToCSV;
+	$.CSVToJSON   = CSVToJSON;
+	$.CSVToTable  = CSVToTable;
 
 
 })(jQuery, window, document);
