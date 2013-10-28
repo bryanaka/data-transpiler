@@ -18,8 +18,6 @@ This is not fully tested yet and will/will likely fail in the following scenario
 
 - tables utilizing colspan
 - JSON with many nested levels (you cannot represent this in CSV or Tables easily)
-- 
-
 
 Goal
 ---------------------------
@@ -40,5 +38,5 @@ Future Milestones
 - Better API
 - Run in both a node and browser environment
 - Test beyond the basic cases (add more tests)
-- Provide more efficent algorithms that reduce the amount of time it takes
+- Provide more efficent algorithms to produce faster operations
 - (maybe) implement promise-based async computation (see lazy.js)
